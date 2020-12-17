@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./fonts/font.css" />
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        outline: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        background-color: #141526;
+      }
+
+      :root {
+        --start-size: 136px;
+        --start-font-size: 1.4rem;
+      }
+
+      @keyframes start-button-running-border-animation {
+        0% {
+          transform: translate(-50%, -50%) rotateZ(0deg);
+        }
+
+        100% {
+          transform: translate(-50%, -50%) rotateZ(360deg);
+        }
+      }
+
+      @keyframes start-button-running {
+        0% {
+          transform: scale(0.8);
+        }
+
+        50% {
+          transform: scale(1.2);
+        }
+
+        100% {
+          transform: scale(0.8);
+        }
+      }
+
+      @keyframes start-button-idling {
+        0% {
+          transform: scale(1);
+        }
+
+        90% {
+          transform: scale(0.7);
+        }
+
+        100% {
+          transform: scale(0.7);
+        }
+      }
+
+      #start {
+        position: relative;
+        width: var(--start-size);
+        height: var(--start-size);
+        user-select: none;
+        cursor: pointer;
+        transition: all 120ms cubic-bezier(0.075, 0.82, 0.165, 1);
+        background: 0;
+        border: 0;
+        color: white;
+      }
+
+      #start:not(.running, .complated) {
+        animation-name: start-button-idling;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-duration: 3s;
+        animation-timing-function: ease-in-out;
+      }
+
+      #start:hover {
+        transform: scale(1.1);
+      }
+
+      #start:active {
+        transform: scale(1.05);
+      }
+
+      #start:hover .background {
+        opacity: 0.9;
+      }
+
+      #start * {
+        width: var(--start-size);
+        height: var(--start-size);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        line-height: var(--start-size);
+        display: block;
+        font-size: var(--start-font-size);
+      }
+
+      #start .border {
+        background: linear-gradient(to bottom, #2de5d1, #1fa4e9);
+      }
+
+      #start .background {
+        background: #141526;
+        width: calc(var(--start-size) - 4px);
+        height: calc(var(--start-size) - 4px);
+      }
+
+      #start p {
+        font-family: "Gotham";
+        font-weight: bold;
+        font-style: normal;
+      }
+
+      #start.hidden {
+        transition: all 600ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
+        transform: scale(0);
+      }
+
+      #start.running {
+        animation-name: start-button-running;
+        animation-iteration-count: infinite;
+        animation-direction: normal;
+        animation-duration: 4s;
+        animation-timing-function: cubic-bezier(1, -0.36, 0, 1.35);
+        cursor: wait;
+      }
+
+      #start.running .border {
+        background: linear-gradient(to bottom, #2de5d1, #1fa4e9);
+        animation-name: start-button-running-border-animation;
+        animation-iteration-count: infinite;
+        animation-direction: normal;
+        animation-duration: 0.8s;
+        animation-timing-function: linear;
+      }
+
+      #start:hover .background,
+      #start.running .background {
+        transition: all 300ms ease-in-out;
+        width: calc(var(--start-size) - 8px);
+        height: calc(var(--start-size) - 8px);
+      }
+
+      #start.complated p {
+        font-size: calc(var(--start-font-size) - 0.2rem);
+      }
+
+      #start.complated .border {
+        transition: all 300ms ease-in-out;
+        background: linear-gradient(to bottom, rgb(47, 255, 168), #1fe9e9);
+      }
+
+      #start.complated .background {
+        transition: all 300ms ease-in-out;
+        width: calc(var(--start-size) - 4px);
+        height: calc(var(--start-size) - 4px);
+      }
+
+      #start-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      #container {
+        padding-top: 1rem;
+        max-width: 1024px;
+        margin: 0 auto;
+      }
+
+      #results {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 2rem;
+        font-size: 2rem;
+      }
+
+      #results.finished {
+        transition: all 300ms ease-in-out;
+        font-size: 2.6rem;
+        padding-bottom: 3rem;
+      }
+
+      #results .group {
+        padding: 0 1rem;
+      }
+
+      #results .group .title {
+        font-size: 0.8em;
+        font-family: "Gotham";
+        font-weight: 400;
+        font-style: normal;
+        text-transform: uppercase;
+        color: white;
+      }
+
+      #results .group .title .mean {
+        font-family: "Gotham";
+        font-weight: 400;
+        font-style: normal;
+        text-transform: none;
+        opacity: 0.7;
+        font-size: 0.6em;
+      }
+
+      #results .group .value {
+        font-family: "Gauge Mono";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 1.4em;
+        color: white;
+        padding-left: 0.2em;
+      }
+
+      #result-image {
+        width: 50%;
+      }
+
+      #start-container.complated {
+        padding-top: 2rem;
+      }
+
+      #toggle-settings {
+        position: absolute;
+        bottom: 0.2rem;
+        left: 0.2rem;
+        color: #ffffff;
+        font-family: "Gotham";
+        font-size: 1rem;
+        cursor: pointer;
+        z-index: 1000;
+        opacity: 0.2;
+      }
+
+      #toggle-settings:hover,
+      #toggle-settings.active {
+        opacity: 1;
+      }
+
+      #toggle-settings:hover {
+        text-decoration: underline;
+      }
+
+      #settings {
+        position: absolute;
+        top: calc(-100vh + 2px);
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        transition: top 300ms ease-in-out;
+        z-index: 100;
+        background-color: #222341d2;
+        padding: 1rem;
+      }
+
+      #settings.showing {
+        top: 0;
+      }
+
+      .input-group {
+        position: relative;
+        display: inline;
+        margin: 0 0.2rem;
+      }
+
+      .input-group label {
+        position: absolute;
+        top: -1.5rem;
+        left: 1rem;
+        font-size: 0.8rem;
+        display: block;
+        color: rgb(0, 0, 0);
+        font-family: "Gotham";
+        background-color: var(--border-color, #1fa4e9);
+        padding: 0.2rem;
+        border-radius: 1rem;
+      }
+
+      .input-group .input {
+        padding: 1rem;
+        border: 2px solid var(--border-color, #1fa4e9);
+        border-radius: 4rem;
+        background-color: #141526;
+        color: rgb(233, 233, 233);
+        transition: all 300ms ease-in-out;
+      }
+
+      .input-group .input:hover,
+      .input-group .input:focus {
+        border-radius: 1rem;
+        color: white;
+      }
+
+      #settings-container {
+        margin: 0 auto;
+        max-width: 1024px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="vue-app">
+      <div id="container">
+        <div
+          id="toggle-settings"
+          @click="isSettingShowing = !isSettingShowing"
+          :class="{'active': isSettingShowing}"
+          v-show="!running || complated"
+        >
+          {{isSettingShowing ? "Main Menu" : "Settings"}}
+        </div>
+        <div id="settings" :class="{'showing': isSettingShowing }">
+          <div id="settings-container">
+            <div class="input-group" style="--border-color: rgb(231, 231, 231)">
+              <label>Ping</label>
+              <input
+                v-model="planned.ping"
+                class="input"
+                placeholder="Ping"
+                type="number"
+                min="0"
+              />
+            </div>
+
+            <div class="input-group" style="--border-color: #58cbc9">
+              <label>Download</label>
+              <input
+                v-model="planned.download"
+                class="input"
+                placeholder="Download"
+                min="0"
+              />
+            </div>
+
+            <div class="input-group" style="--border-color: #955ac9">
+              <label>Upload</label>
+              <input
+                v-model="planned.upload"
+                class="input"
+                placeholder="Upload"
+                min="0"
+              />
+            </div>
+
+            <br /><br />
+
+            <div class="input-group" style="--border-color: #dbe64c">
+              <label>Server</label>
+              <select
+                v-model="planned.serverid"
+                ref="serverList"
+                class="input"
+              ></select>
+            </div>
+          </div>
+        </div>
+        <div id="results" :class="{'finished': complated}">
+          <span class="group ping">
+            <p class="title">Ping <span class="mean">ms</span></p>
+            <p class="value">{{result.ping}}</p>
+          </span>
+          <span class="group download">
+            <p class="title">Download <span class="mean">Mbps</span></p>
+            <p class="value">{{result.download}}</p>
+          </span>
+          <span class="group upload">
+            <p class="title">Upload <span class="mean">Mbps</span></p>
+            <p class="value">{{result.upload}}</p>
+          </span>
+        </div>
+        <center
+          :style="`transition: all 600ms ease-in-out; ${complated ? `opacity: 1; pointer-events: all; transform: scale(1); display: block;` : `opacity: 0; pointer-events: none; transform: scale(0); display: none;`}`"
+        >
+          <a
+            href="#"
+            onclick="require('child_process').exec(`start https://www.speedtest.net/result/${app.resultId}`)"
+            title="Click to open in new window."
+          >
+            <img
+              id="result-image"
+              :src="`https://www.speedtest.net/result/${resultId}.png`"
+            />
+          </a>
+        </center>
+        <div
+          id="start-container"
+          v-show="!startButton.hidden"
+          :class="{'complated': complated}"
+        >
+          <button
+            ref="start"
+            id="start"
+            @click="startTest"
+            :class="{'hidden': startButton.hidden, 'running': running, 'complated': complated}"
+          >
+            <div class="border"></div>
+            <div class="background"></div>
+            <p>{{startButton.text}}</p>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"
+      integrity="sha512-z4OUqw38qNLpn1libAN9BsoDx6nbNFio5lA6CuTp9NlK83b89hgyCVq+N5FdBJptINztxn1Z3SaKSKUS5UP60Q=="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+      const { ipcRenderer } = require("electron");
+      const app = new Vue({
+        el: "#vue-app",
+        data: {
+          startButton: {
+            text: "Start",
+            hidden: false,
+          },
+          running: false,
+          complated: false,
+          result: {
+            ping: 0,
+            download: 0,
+            upload: 0,
+          },
+          planned: {
+            ping: getRandomInt(1, 5),
+            download: getRandomArbitrary(500, 1500, 2),
+            upload: getRandomArbitrary(100, 500, 2),
+            serverid: 11250,
+          },
+          anim: null,
+          resultId: 0,
+          isSettingShowing: false,
+          true: true,
+          false: false,
+        },
+        watch: {
+          running(val) {
+            this.startButton.text = val ? "Working" : "Start";
+          },
+          complated(val) {
+            this.startButton.text = val ? "Complated" : "Start";
+          },
+          "planned.ping"(val) {
+            this.planned.ping = parseInt(val || 0);
+          },
+          "planned.download"(val) {
+            this.planned.download = parseFloat(val || 0);
+          },
+          "planned.upload"(val) {
+            this.planned.upload = parseFloat(val || 0);
+          },
+          "planned.serverid"(val) {
+            if (val.includes("refetch")) {
+              app.$refs.serverList.options.length = 0;
+              app.$refs.serverList.options.add(createOption("0", "Loading.."));
+              app.$refs.serverList.options.selectedIndex = 0;
+              ipcRenderer.send("serverList");
+            } else {
+              this.planned.serverid = val;
+            }
+          },
+        },
+        methods: {
+          startTest(e) {
+            if (this.running) return;
+            if (this.complated) return this.resetTest();
+            this.running = true;
+
+            ipcRenderer.send("fakeTest", app.planned);
+
+            this.anim = anime({
+              targets: app.result,
+              ...app.planned,
+              easing: "easeOutCirc",
+              round: 20,
+              duration: 6000,
+              complete() {
+                app.running = false;
+                app.complated = true;
+                // app.startButton.hidden = true;
+              },
+            });
+          },
+          resetTest() {
+            app.running = app.complated = app.startButton.hidden = false;
+            this.result.ping = this.result.download = this.result.upload = this.resultId = 0;
+          },
+        },
+      });
+
+      ipcRenderer.on("resultId", (event, data) => {
+        if (!data) {
+          if (!app.anim) return;
+          app.anim.complete();
+          return app.resetTest();
+        }
+        app.resultId = data;
+      });
+
+      ipcRenderer.on("serverList", (event, servers) => {
+        app.$refs.serverList.options.length = 0;
+
+        app.$refs.serverList.options.add(
+          createOption("refetch", "<- Refetch ->")
+        );
+
+        servers.forEach((data) => {
+          app.$refs.serverList.options.add(
+            createOption(
+              data.id,
+              `${data.country} | ${data.name} - ${data.sponsor}`
+            )
+          );
+        });
+
+        app.$refs.serverList.options.selectedIndex = 1;
+
+        app.$refs.serverList.options.add(
+          createOption("refetch-", "<- Refetch ->")
+        );
+      });
+      ipcRenderer.send("serverList");
+      app.$refs.serverList.options.add(createOption("0", "Loading.."));
+      app.$refs.serverList.options.selectedIndex = 0;
+
+      // https://stackoverflow.com/a/1527820/11949394
+      function getRandomArbitrary(min, max, fixer = 4) {
+        return parseFloat((Math.random() * (max - min) + min).toFixed(fixer));
+      }
+
+      // https://stackoverflow.com/a/1527820/11949394
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function createOption(value, text) {
+        let option = document.createElement("option");
+        option.value = value;
+        option.textContent = text;
+        return option;
+      }
+    </script>
+  </body>
+</html>
