@@ -7,7 +7,7 @@ const eApp = express();
 const XML = require('xml2js');
 const util = require("util");
 
-eApp.use(express.static(path.resolve("./public")));
+eApp.use(express.static(path.resolve(__dirname, "public")));
 
 eApp.listen(1976);
 console.log("\n");
@@ -80,4 +80,9 @@ app.once("ready", () => {
 
         browserWindow.webContents.send("serverList", serversArray);
     })
-})
+});
+
+app.on(
+    "window-all-closed",
+    () => process.platform !== "darwin" && app.quit()
+);
