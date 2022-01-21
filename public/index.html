@@ -4,107 +4,125 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./fonts/font.css" />
-    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            animation: {
+              ping: "ping 1.5s linear infinite",
+            },
+          },
+        },
+      };
+    </script>
   </head>
   <body>
     <div id="vue-app">
-      <div id="container">
-        <div
-          id="toggle-settings"
+      <div class="min-h-screen bg-gray-900 flex justify-center text-white">
+        <button
           @click="isSettingShowing = !isSettingShowing"
-          :class="{'active': isSettingShowing}"
-          v-show="!running || complated"
+          class="p-2 fixed left-0 top-0"
+          v-show="!running || completed"
         >
           {{isSettingShowing ? "Main Menu" : "Settings"}}
+        </button>
+
+        <div v-if="!isSettingShowing" class="flex flex-col">
+          <div class="mt-20 self-center flex gap-4 font-semibold text-2xl">
+            <span>
+              <p>Ping <span class="text-sm opacity-60">ms</span></p>
+              <p>{{result.ping}}</p>
+            </span>
+            <span>
+              <p>Download <span class="mean text-sm opacity-60">Mbps</span></p>
+              <p>{{result.download}}</p>
+            </span>
+            <span>
+              <p>
+                Upload
+                <span class="text-sm opacity-60">Mbps</span>
+              </p>
+              <p>{{result.upload}}</p>
+            </span>
+          </div>
+          <div
+            v-show="!startButton.hidden"
+            class="flex flex-col mt-24 self-center"
+          >
+            <button
+              ref="start"
+              @click="trans(); startTest();"
+              class="self-center trans bg-gradient-to-b flex flex-col p-[2px] outline-none rounded-full from-[#2de5d1] to-[#1fa4e9]"
+            >
+              <span
+                class="border w-24 h-24 rounded-full animate-ping border-[#26c5dd] absolute"
+              ></span>
+              <div
+                class="self-center flex flex-col justify-center text-xl bg-[#26273b] rounded-full w-24 h-24"
+              >
+                {{startButton.text}}
+              </div>
+            </button>
+          </div>
+          <center
+            class="mt-20 px-24 opacity-0"
+            :class="{ 'opacity-100': completed  }"
+          >
+            <a
+              href="#"
+              onclick="require('child_process').exec(`start https://www.speedtest.net/result/${app.resultId}`)"
+              title="Click to open in new window."
+            >
+              <img :src="`https://www.speedtest.net/result/${resultId}.png`" />
+            </a>
+          </center>
         </div>
-        <div id="settings" :class="{'showing': isSettingShowing }">
-          <div id="settings-container">
-            <div class="input-group" style="--border-color: rgb(231, 231, 231)">
-              <label>Ping</label>
-              <input
-                v-model="planned.ping"
-                class="input"
-                placeholder="Ping"
-                type="number"
-                min="0"
-              />
+
+        <div id="settings" v-else>
+          <div class="flex flex-col gap-4 w-auto justify-center items-center">
+            <div>
+              <div>
+                <label class="flex">Ping</label>
+                <input
+                  v-model="planned.ping"
+                  class="rounded-sm text-black"
+                  placeholder="Ping"
+                  type="number"
+                  min="0"
+                />
+              </div>
             </div>
 
-            <div class="input-group" style="--border-color: #58cbc9">
-              <label>Download</label>
+            <div>
+              <label class="flex">Download</label>
               <input
                 v-model="planned.download"
-                class="input"
+                class="rounded-sm text-black"
                 placeholder="Download"
                 min="0"
               />
             </div>
 
-            <div class="input-group" style="--border-color: #955ac9">
-              <label>Upload</label>
+            <div>
+              <label class="flex">Upload</label>
               <input
                 v-model="planned.upload"
-                class="input"
+                class="rounded-sm text-black"
                 placeholder="Upload"
                 min="0"
               />
             </div>
 
-            <br /><br />
-
-            <div class="input-group" style="--border-color: #dbe64c">
-              <label>Server</label>
+            <div>
+              <label class="flex">Server</label>
               <select
                 v-model="planned.serverid"
                 ref="serverList"
-                class="input"
+                class="text-black"
               ></select>
             </div>
           </div>
-        </div>
-        <div id="results" :class="{'finished': complated}">
-          <span class="group ping">
-            <p class="title">Ping <span class="mean">ms</span></p>
-            <p class="value">{{result.ping}}</p>
-          </span>
-          <span class="group download">
-            <p class="title">Download <span class="mean">Mbps</span></p>
-            <p class="value">{{result.download}}</p>
-          </span>
-          <span class="group upload">
-            <p class="title">Upload <span class="mean">Mbps</span></p>
-            <p class="value">{{result.upload}}</p>
-          </span>
-        </div>
-        <center
-          :style="`transition: all 600ms ease-in-out; ${complated ? `opacity: 1; pointer-events: all; transform: scale(1); display: block;` : `opacity: 0; pointer-events: none; transform: scale(0); display: none;`}`"
-        >
-          <a
-            href="#"
-            onclick="require('child_process').exec(`start https://www.speedtest.net/result/${app.resultId}`)"
-            title="Click to open in new window."
-          >
-            <img
-              id="result-image"
-              :src="`https://www.speedtest.net/result/${resultId}.png`"
-            />
-          </a>
-        </center>
-        <div
-          id="start-container"
-          v-show="!startButton.hidden"
-          :class="{'complated': complated}"
-        >
-          <button
-            ref="start"
-            id="start"
-            @click="startTest"
-            :class="{'hidden': startButton.hidden, 'running': running, 'complated': complated}"
-          >
-            <div class="border"></div>
-            <div class="background"></div>
-            <p>{{startButton.text}}</p>
-          </button>
         </div>
       </div>
     </div>
