@@ -3,8 +3,9 @@ a speed test faker with very cool gui
 
 
 
-[![prew](https://i.imgur.com/uMvTiSr.png)](https://i.imgur.com/UdiOto1.mp4)
+[![prew](https://i.imgur.com/t4vXUNH.png)](https://i.imgur.com/UdiOto1.mp4)
 
-![settings](https://i.imgur.com/4ispDwv.png)
+![settings](https://i.imgur.com/imUGWNwh.jpg)
+# How to Run
 
-`electron .`
+`npm run start`
